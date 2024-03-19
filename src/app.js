@@ -5,6 +5,7 @@ const favicon = require('express-favicon');
 const logger = require('morgan');
 
 const mainRouter = require('./routes/mainRouter.js');
+const userRouter = require("./routes/userRouter.js")
 const itemsRouter = require('./routes/item.js');
 
 // middleware
@@ -16,6 +17,7 @@ app.use(express.static('public'))
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
 // routes
+app.use("/api/v1/users", userRouter)
 app.use('/api/v1', mainRouter);
 app.use('/api/v1/items', itemsRouter);
 
