@@ -6,7 +6,7 @@ const {
     getAllItems, 
     updateItem,
     deleteItem
-} = require('../controllers/item');
+} = require('../controllers/itemController');
 
 router.route('/').post(createItem).get(getAllItems);
 router.route('/:id').get(getItem).patch(updateItem).delete(deleteItem);

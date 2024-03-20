@@ -4,15 +4,15 @@ const ItemSchema = new mongoose.Schema(
     {
         title: {
             type: String,
-            required: true,
+            required: [true, 'Please provide an item title'],
         },
         description: {
             type: String,
-            required: true,
+            required: [true, 'Please provide an item description'],
         },
         location: {
             type: String,
-            required: true,
+            required: [true, 'Please enter the location where the item was lost'],
         },
         lost: {
             type: Boolean,
@@ -25,7 +25,7 @@ const ItemSchema = new mongoose.Schema(
         },
         reportedBy: {
             type: mongoose.Types.ObjectId,
-            ref: 'User', //subject to change depending on user model
+            ref: 'User',
             required: true,
         },
         dateClaimed: {
@@ -34,7 +34,7 @@ const ItemSchema = new mongoose.Schema(
         },
         claimedBy: {
             type: mongoose.Types.ObjectId,
-            ref: 'User', //subject to change depending on user model
+            ref: 'User',
             required: () => {
                 if (dateClaimed === true) {
                     return true;
