@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please provide your username"],
     minlength: 3,
     maxlength: 50,
+    unique: true,
+    trim: true,
   },
   email: {
     type: String,
@@ -18,6 +20,8 @@ const userSchema = new mongoose.Schema({
       "Please provide a valid email",
     ],
     unique: true,
+    trim: true,
+    lowercase: true,
   },
   password: {
     type: String,
@@ -25,11 +29,9 @@ const userSchema = new mongoose.Schema({
   },
   location: {
     type: String,
+    trim: true,
   },
 });
-
-// Index for email field to enforce uniqueness
-userSchema.index({ email: 1 }, { unique: true });
 
 userSchema.pre("save", async function (next) {
   try {
@@ -45,12 +47,12 @@ userSchema.pre("save", async function (next) {
       return next(error);
     }
 
-    // Checking email uniqueness using a unique index in the database
-    const emailInUse = await mongoose
+    // Checking username and email uniqueness 
+    const userExists = await mongoose
       .model("User")
-      .findOne({ email: this.email });
-    if (emailInUse) {
-      const error = new Error("Email is already in use");
+      .findOne({ $or: [{ username: this.username }, { email: this.email }] });
+    if (userExists) {
+      const error = new Error("Username or email already exists");
       error.status = 400;
       return next(error);
     }
