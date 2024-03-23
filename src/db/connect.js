@@ -1,4 +1,4 @@
-const mongoose= require("mongoose");
+const mongoose = require("mongoose");
 
 const connectDB = (url) => {
     console.log("Connected to the database.");
