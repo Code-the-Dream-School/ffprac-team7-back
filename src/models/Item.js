@@ -22,6 +22,7 @@ const ItemSchema = new mongoose.Schema(
         dateReported: {
             type: Date,
             required: true,
+            default: Date.now()
         },
         reportedBy: {
             type: mongoose.Types.ObjectId,
@@ -30,16 +31,12 @@ const ItemSchema = new mongoose.Schema(
         },
         dateClaimed: {
             type: Date,
-            required: false,
+            required: [false, 'Please provide the date the item is being claimed'],
         },
         claimedBy: {
             type: mongoose.Types.ObjectId,
             ref: 'User',
-            required: () => {
-                if (dateClaimed === true) {
-                    return true;
-                } else { return false; }
-            },
+            required: [false, 'Please provide the id of the person claiming this item']
         },
         claimConfirmed: {
             type: Boolean,
