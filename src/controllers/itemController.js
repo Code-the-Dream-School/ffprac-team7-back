@@ -2,9 +2,9 @@ const Item = require('../models/Item');
 const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 
-// Add an item to the database. This will be updated to require userId in the next PR.
 const createItem = async (req, res) => {
     try {
+        req.body.reportedBy = req.user.userId
         const item = await Item.create(req.body);
         res.status(StatusCodes.CREATED).json({msg:'The item has been created.', item});
 
