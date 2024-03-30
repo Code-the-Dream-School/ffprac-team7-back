@@ -126,17 +126,18 @@ const claimItem = async (req, res) =>{
     }
 }
 
-// The req will be updated with the userId in the next PR
+// Delete an item while logged into the item creator account
 const deleteItem = async (req, res) => {
    try {
         const {
+            user: {userId},
             params: {itemId: itemId}
         } = req
 
-        const item = await Item.findByIdAndDelete(itemId);
+        const item = await Item.findOneAndDelete({_id:itemId, reportedBy:userId});
 
         if (!item) {
-            res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} was not found.`});
+            res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} reported by this user was not found.`});
 
         } else {
             res.status(StatusCodes.OK).json({msg:`The item has been deleted.`});  
@@ -147,6 +148,28 @@ const deleteItem = async (req, res) => {
    }
 }
 
+// Delete item while logged in into the claimer account AND with claimedConfirmed: true;
+const deleteConfirmedItem = async (req, res) => {
+    try {
+         const {
+             user: {userId},
+             params: {itemId: itemId}
+         } = req
+ 
+         const item = await Item.findOneAndDelete({ _id:itemId, claimedBy:userId, claimConfirmed:true});
+ 
+         if (!item) {
+             res.status(StatusCodes.NOT_FOUND).json({msg:`The item does not exist, or its claim has not yet been confirmed.`});
+
+         } else {
+             res.status(StatusCodes.OK).json({msg:`The item has been deleted.`});  
+         }
+ 
+    } catch (error) {
+         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error.message); 
+    }
+ }
+
 module.exports = {
     createItem,
     getItem,
@@ -154,5 +177,6 @@ module.exports = {
     getAllItemsByUser,
     updateItem,
     claimItem, 
-    deleteItem
+    deleteItem,
+    deleteConfirmedItem,
 }
