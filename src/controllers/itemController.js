@@ -5,7 +5,7 @@ const { StatusCodes } = require('http-status-codes');
 // Create an item
 const createItem = async (req, res) => {
     try {
-        req.body.reportedBy = req.user.userId
+        req.body.reportedBy = req.user.userId;
         const item = await Item.create(req.body);
         res.status(StatusCodes.CREATED).json({msg:'The item has been created.', item});
 
@@ -51,7 +51,7 @@ const getAllItemsByUser = async (req, res) => {
     try {
         const {
             params: {userId: userId}
-        } = req
+        } = req;
 
         const items = await Item.find({reportedBy: userId}).sort('createdAt');
         const user = await User.findOne({_id: userId});
@@ -78,12 +78,12 @@ const updateItem = async (req, res) => {
             body: {title, description, location, lost, dateClaimed, claimedBy},
             user: {userId},
             params: {itemId: itemId},
-        } = req
+        } = req;
 
         const item = await Item.findOneAndUpdate({_id: itemId, reportedBy: userId}, req.body, {new:true, runValidators:true});
 
         if (!item) {
-            res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} reported by this user was not found.`})
+            res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} reported by this user was not found.`});
 
         } else if (title === '')  {
             res.status(StatusCodes.BAD_REQUEST).json({msg:`Please provide item title.`});
@@ -99,6 +99,30 @@ const updateItem = async (req, res) => {
 
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error.message); 
+    }
+}
+
+// Claim an item while logged in
+const claimItem = async (req, res) =>{
+    try {
+        req.body.lost = false;
+        req.body.claimedBy = req.user.userId;
+        req.body.dateClaimed = Date.now();
+
+        const {
+            params: {itemId: itemId}
+        } = req;
+
+        const item = await Item.findOneAndUpdate({_id: itemId}, req.body, {new:true, runValidators:true})
+
+        if (!item) {
+            res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} was not found.`});
+
+        }
+        res.status(StatusCodes.OK).json({msg:'The item has been successfully claimed.', item});
+
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error.message);
     }
 }
 
@@ -129,5 +153,6 @@ module.exports = {
     getAllItems, 
     getAllItemsByUser,
     updateItem,
+    claimItem, 
     deleteItem
 }
