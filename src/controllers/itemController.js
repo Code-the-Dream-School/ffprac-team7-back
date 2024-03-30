@@ -2,6 +2,7 @@ const Item = require('../models/Item');
 const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 
+// Create an item
 const createItem = async (req, res) => {
     try {
         req.body.reportedBy = req.user.userId
@@ -70,18 +71,19 @@ const getAllItemsByUser = async (req, res) => {
     }
 }
 
-// The req will be updated with the userId in the next PR
+// Update item by the user who reported it
 const updateItem = async (req, res) => {
     try {
         const {
             body: {title, description, location, lost, dateClaimed, claimedBy},
+            user: {userId},
             params: {itemId: itemId},
         } = req
 
-        const item = await Item.findOneAndUpdate({_id: itemId}, req.body, {new:true, runValidators:true});
+        const item = await Item.findOneAndUpdate({_id: itemId, reportedBy: userId}, req.body, {new:true, runValidators:true});
 
         if (!item) {
-            res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} was not found.`})
+            res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} reported by this user was not found.`})
 
         } else if (title === '')  {
             res.status(StatusCodes.BAD_REQUEST).json({msg:`Please provide item title.`});
@@ -91,18 +93,7 @@ const updateItem = async (req, res) => {
 
         } else if (location === '') {
             res.status(StatusCodes.BAD_REQUEST).json({msg:`Please provide the location where the item was lost.`});
-
-        } else if (lost === '') {
-            res.status(StatusCodes.BAD_REQUEST).json({msg:`Please indicate if the item is lost or not.`});
-
-            // The code below will be updated. The current conditional is not working when (lost===false).
-        } else if (lost === false) {
-            if (dateClaimed === '') {
-                res.status(StatusCodes.BAD_REQUEST).json({msg:`Please provide the date the item is being claimed.`});
-
-            } else if (claimedBy === '') {
-                res.status(StatusCodes.BAD_REQUEST).json({msg:`Please provide the id of the person claiming the item.`});
-            }
+        
         }
         res.status(StatusCodes.OK).json({msg:'The item has been updated.', item});  
 
