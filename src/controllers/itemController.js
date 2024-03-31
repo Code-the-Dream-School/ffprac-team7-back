@@ -2,7 +2,7 @@ const Item = require('../models/Item');
 const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 
-// Create an item
+// Allows a logged in user to POST lost item
 const createItem = async (req, res) => {
     try {
         req.body.reportedBy = req.user.userId;
@@ -14,7 +14,7 @@ const createItem = async (req, res) => {
     }
 }
 
-// Get a specific item by item id
+// Allows a user to GET an item by item id
 const getItem = async (req, res) => {
     try {
         const {
@@ -35,7 +35,7 @@ const getItem = async (req, res) => {
     }
 }
 
-// Get all the items in the database
+// Allowes a user to GET all the items in the database
 const getAllItems = async (req, res) => {
     try {
         const items = await Item.find({}).sort('createdAt');
@@ -46,7 +46,7 @@ const getAllItems = async (req, res) => {
     }
 }
 
-// Get all the items a specific user has reported
+// Allowes a user to GET all the items a user account has POSTed
 const getAllItemsByUser = async (req, res) => {
     try {
         const {
@@ -71,11 +71,11 @@ const getAllItemsByUser = async (req, res) => {
     }
 }
 
-// Update item by the user who reported it
+// Allowes a logged in user to Update (PUT) an item they have POSTed
 const updateItem = async (req, res) => {
     try {
         const {
-            body: {title, description, location, lost, dateClaimed, claimedBy},
+            body: {title, description, location},
             user: {userId},
             params: {itemId: itemId},
         } = req;
@@ -102,7 +102,7 @@ const updateItem = async (req, res) => {
     }
 }
 
-// Claim an item while logged in
+// Allowes a logged in user to claim (PUT) ownership of an item with their userId
 const claimItem = async (req, res) =>{
     try {
         req.body.lost = false;
@@ -126,7 +126,32 @@ const claimItem = async (req, res) =>{
     }
 }
 
-// Delete an item while logged into the item creator account
+// Allowes a logged in user to confirm (POST) that the claimer's ownership of the item they have POSTed has been verified
+const confirmClaim = async (req, res) => {
+
+    try {
+        req.body.claimConfirmed = true;
+        
+        const {
+            user: {userId},
+            params: {itemId: itemId}
+        } = req
+
+        const item = await Item.findOneAndUpdate({_id:itemId, reportedBy:userId }, req.body, {new:true, runValidators:true});
+
+        if (!item) {
+        res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} reported by this user was not found.`});
+
+        }
+        res.status(StatusCodes.OK).json({msg:'The claim of this item has successfully been confirmed.', item});
+
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error.message); 
+    }
+
+}
+
+// Allowes a logged in user to DELETE an item they have POSTed
 const deleteItem = async (req, res) => {
    try {
         const {
@@ -148,7 +173,8 @@ const deleteItem = async (req, res) => {
    }
 }
 
-// Delete item while logged in into the claimer account AND with claimedConfirmed: true;
+// Allowes a logged in user to DELETE an item they have have claimed has their own, 
+// after their ownership has been confirmed by the original POSTer
 const deleteConfirmedItem = async (req, res) => {
     try {
          const {
@@ -177,6 +203,7 @@ module.exports = {
     getAllItemsByUser,
     updateItem,
     claimItem, 
+    confirmClaim,
     deleteItem,
     deleteConfirmedItem,
 }
