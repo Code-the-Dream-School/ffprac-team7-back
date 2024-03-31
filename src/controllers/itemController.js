@@ -2,9 +2,10 @@ const Item = require('../models/Item');
 const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 
-// Add an item to the database. This will be updated to require userId in the next PR.
+// Allows a logged in user to POST lost item
 const createItem = async (req, res) => {
     try {
+        req.body.reportedBy = req.user.userId;
         const item = await Item.create(req.body);
         res.status(StatusCodes.CREATED).json({msg:'The item has been created.', item});
 
@@ -13,7 +14,7 @@ const createItem = async (req, res) => {
     }
 }
 
-// Get a specific item by item id
+// Allows a user to GET an item by item id
 const getItem = async (req, res) => {
     try {
         const {
@@ -34,7 +35,7 @@ const getItem = async (req, res) => {
     }
 }
 
-// Get all the items in the database
+// Allowes a user to GET all the items in the database
 const getAllItems = async (req, res) => {
     try {
         const items = await Item.find({}).sort('createdAt');
@@ -45,12 +46,12 @@ const getAllItems = async (req, res) => {
     }
 }
 
-// Get all the items a specific user has reported
+// Allowes a user to GET all the items a user account has POSTed
 const getAllItemsByUser = async (req, res) => {
     try {
         const {
             params: {userId: userId}
-        } = req
+        } = req;
 
         const items = await Item.find({reportedBy: userId}).sort('createdAt');
         const user = await User.findOne({_id: userId});
@@ -70,18 +71,19 @@ const getAllItemsByUser = async (req, res) => {
     }
 }
 
-// The req will be updated with the userId in the next PR
+// Allowes a logged in user to Update (PUT) an item they have POSTed
 const updateItem = async (req, res) => {
     try {
         const {
-            body: {title, description, location, lost, dateClaimed, claimedBy},
+            body: {title, description, location},
+            user: {userId},
             params: {itemId: itemId},
-        } = req
+        } = req;
 
-        const item = await Item.findOneAndUpdate({_id: itemId}, req.body, {new:true, runValidators:true});
+        const item = await Item.findOneAndUpdate({_id: itemId, reportedBy: userId}, req.body, {new:true, runValidators:true});
 
         if (!item) {
-            res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} was not found.`})
+            res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} reported by this user was not found.`});
 
         } else if (title === '')  {
             res.status(StatusCodes.BAD_REQUEST).json({msg:`Please provide item title.`});
@@ -91,18 +93,7 @@ const updateItem = async (req, res) => {
 
         } else if (location === '') {
             res.status(StatusCodes.BAD_REQUEST).json({msg:`Please provide the location where the item was lost.`});
-
-        } else if (lost === '') {
-            res.status(StatusCodes.BAD_REQUEST).json({msg:`Please indicate if the item is lost or not.`});
-
-            // The code below will be updated. The current conditional is not working when (lost===false).
-        } else if (lost === false) {
-            if (dateClaimed === '') {
-                res.status(StatusCodes.BAD_REQUEST).json({msg:`Please provide the date the item is being claimed.`});
-
-            } else if (claimedBy === '') {
-                res.status(StatusCodes.BAD_REQUEST).json({msg:`Please provide the id of the person claiming the item.`});
-            }
+        
         }
         res.status(StatusCodes.OK).json({msg:'The item has been updated.', item});  
 
@@ -111,17 +102,67 @@ const updateItem = async (req, res) => {
     }
 }
 
-// The req will be updated with the userId in the next PR
-const deleteItem = async (req, res) => {
-   try {
+// Allowes a logged in user to claim (PUT) ownership of an item with their userId
+const claimItem = async (req, res) =>{
+    try {
+        req.body.lost = false;
+        req.body.claimedBy = req.user.userId;
+        req.body.dateClaimed = Date.now();
+
         const {
             params: {itemId: itemId}
-        } = req
+        } = req;
 
-        const item = await Item.findByIdAndDelete(itemId);
+        const item = await Item.findOneAndUpdate({_id: itemId}, req.body, {new:true, runValidators:true})
 
         if (!item) {
             res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} was not found.`});
+
+        }
+        res.status(StatusCodes.OK).json({msg:'The item has been successfully claimed.', item});
+
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error.message);
+    }
+}
+
+// Allowes a logged in user to confirm (POST) that the claimer's ownership of the item they have POSTed has been verified
+const confirmClaim = async (req, res) => {
+
+    try {
+        req.body.claimConfirmed = true;
+        
+        const {
+            user: {userId},
+            params: {itemId: itemId}
+        } = req
+
+        const item = await Item.findOneAndUpdate({_id:itemId, reportedBy:userId }, req.body, {new:true, runValidators:true});
+
+        if (!item) {
+        res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} reported by this user was not found.`});
+
+        }
+        res.status(StatusCodes.OK).json({msg:'The claim of this item has successfully been confirmed.', item});
+
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error.message); 
+    }
+
+}
+
+// Allowes a logged in user to DELETE an item they have POSTed
+const deleteItem = async (req, res) => {
+   try {
+        const {
+            user: {userId},
+            params: {itemId: itemId}
+        } = req
+
+        const item = await Item.findOneAndDelete({_id:itemId, reportedBy:userId});
+
+        if (!item) {
+            res.status(StatusCodes.NOT_FOUND).json({msg:`The item with id:${itemId} reported by this user was not found.`});
 
         } else {
             res.status(StatusCodes.OK).json({msg:`The item has been deleted.`});  
@@ -132,11 +173,37 @@ const deleteItem = async (req, res) => {
    }
 }
 
+// Allowes a logged in user to DELETE an item they have have claimed has their own, 
+// after their ownership has been confirmed by the original POSTer
+const deleteConfirmedItem = async (req, res) => {
+    try {
+         const {
+             user: {userId},
+             params: {itemId: itemId}
+         } = req
+ 
+         const item = await Item.findOneAndDelete({ _id:itemId, claimedBy:userId, claimConfirmed:true});
+ 
+         if (!item) {
+             res.status(StatusCodes.NOT_FOUND).json({msg:`The item does not exist, or its claim has not yet been confirmed.`});
+
+         } else {
+             res.status(StatusCodes.OK).json({msg:`The item has been deleted.`});  
+         }
+ 
+    } catch (error) {
+         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error.message); 
+    }
+ }
+
 module.exports = {
     createItem,
     getItem,
     getAllItems, 
     getAllItemsByUser,
     updateItem,
-    deleteItem
+    claimItem, 
+    confirmClaim,
+    deleteItem,
+    deleteConfirmedItem,
 }

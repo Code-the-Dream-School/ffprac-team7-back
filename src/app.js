@@ -16,9 +16,12 @@ app.use(logger('dev'));
 app.use(express.static('public'))
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
+// user authentication
+const authenticateUser = require('./middleware/authentication.js');
+
 // routes
-app.use("/api/v1/users", userRouter)
+app.use("/api/v1/users", userRouter);
 app.use('/api/v1', mainRouter);
-app.use('/api/v1/items', itemsRouter);
+app.use('/api/v1/items', authenticateUser, itemsRouter);
 
 module.exports = app;
