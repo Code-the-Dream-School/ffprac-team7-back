@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
+const { BadRequestError, CreateError } = require("../errors");
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -36,34 +37,26 @@ const userSchema = new mongoose.Schema({
 userSchema.pre("save", async function (next) {
   try {
     if (!validator.isAlphanumeric(this.username)) {
-      const error = new Error("Username must be alphanumeric");
-      error.status = 400;
-      return next(error);
+      throw new BadRequestError("Username must be alphanumeric");
     }
 
     if (!validator.isEmail(this.email)) {
-      const error = new Error("Please provide a valid email");
-      error.status = 400;
-      return next(error);
+      throw new BadRequestError("Please provide a valid email");
     }
 
-    // Checking username and email uniqueness 
+    // Checking username and email uniqueness
     const userExists = await mongoose
       .model("User")
       .findOne({ $or: [{ username: this.username }, { email: this.email }] });
     if (userExists) {
-      const error = new Error("Username or email already exists");
-      error.status = 400;
-      return next(error);
+      throw new CreateError("Username or email already exists");
     }
 
     // Checking customized password strength
     if (!isPasswordStrongEnough(this.password)) {
-      const error = new Error(
+      throw new BadRequestError(
         "Password must be at least 8 characters long and contain at least one digit, one lowercase letter, and one uppercase letter"
       );
-      error.status = 400;
-      return next(error);
     }
 
     const salt = await bcrypt.genSalt(10);
