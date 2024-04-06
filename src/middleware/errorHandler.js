@@ -25,7 +25,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
       customError.msg = "User not found";
       customError.statusCode = StatusCodes.NOT_FOUND;
     } else {
-      customError.msg = `No item found with id : ${err.value}`;
+      customError.msg = `The item with id: ${err.value} was not found.`;
       customError.statusCode = StatusCodes.NOT_FOUND;
     }
   }
