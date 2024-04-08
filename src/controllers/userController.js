@@ -1,57 +1,44 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const validatePassword = require("../middleware/updatePasswordValidation");
+const { StatusCodes } = require("http-status-codes");
+const { UnauthenticatedError, NotFoundError } = require("../errors");
 
-const signup = async (req, res) => {
+const signup = async (req, res, next) => {
   try {
     const user = await User.create({ ...req.body });
     const token = user.createJWT();
-    res.status(201).json({
+    res.status(StatusCodes.CREATED).json({
       username: user.username,
       email: user.email,
       location: user.location,
       token,
     });
   } catch (error) {
-    console.error(error);
-    let statusCode = 500;
-    let errorMessage = "Internal Server Error";
-
-    // checking for a validation error
-    if (error.name === "ValidationError") {
-      statusCode = 400;
-      errorMessage = error.message;
-
-      // checking for duplicate email addresses
-    } else if (error.code === 11000) {
-      statusCode = 409;
-      errorMessage = "Username or email already exists";
-    }
-    res.status(statusCode).json({ error: errorMessage });
+    next(error);
   }
 };
 
-const getUserByUsername = async (req, res) => {
+const getUserByUsername = async (req, res, next) => {
   try {
     const { username } = req.params;
     const user = await User.findOne({ username });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      throw new NotFoundError("User not found");
     }
 
-    res.status(200).json({
+    res.status(StatusCodes.OK).json({
       username: user.username,
       email: user.email,
       location: user.location,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   try {
     // validate password in the request body
     validatePassword(req.body);
@@ -70,68 +57,60 @@ const updateUser = async (req, res) => {
       new: true,
       runValidators: true,
     });
-    res.status(200).json({
+    res.status(StatusCodes.OK).json({
       message: "User updated successfully",
       username: updatedUser.username,
       email: updatedUser.email,
       location: updatedUser.location,
     });
   } catch (error) {
-    console.error(error);
-    if (error.code === 11000) {
-      return res
-        .status(409)
-        .json({ error: "Username or email already in use" });
-    }
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-const deleteUser = async (req, res) => {
+const deleteUser = async (req, res, next) => {
   try {
-    const { username } = req.params;
-    const deletedUser = await User.findOneAndDelete({ username });
+    const { userId } = req.params;
+    const deletedUser = await User.findByIdAndDelete(userId);
 
     if (!deletedUser) {
-      return res.status(404).json({ error: "User not found" });
+      throw new NotFoundError("User not found");
     }
 
-    res.status(200).json({
+    res.status(StatusCodes.OK).json({
       message: "User deleted successfully",
       username: deletedUser.username,
       email: deletedUser.email,
       location: deletedUser.location,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
 
     if (!user) {
-      return res.status(401).json({ error: "Invalid username or password" });
+      throw new UnauthenticatedError("Invalid username or password");
     }
 
     const isPasswordCorrect = await user.comparePassword(password);
     if (!isPasswordCorrect) {
-      return res.status(401).json({ error: "Invalid username or password" });
+      throw new UnauthenticatedError("Invalid username or password");
     }
 
     const token = user.createJWT();
-    res.status(200).json({
+    res.status(StatusCodes.OK).json({
       username: user.username,
       email: user.email,
       location: user.location,
       token,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Login failed" });
+    next(error);
   }
 };
 
