@@ -54,11 +54,15 @@ const userSchema = new mongoose.Schema({
       message: "Please provide a valid phone number",
     },
   },
+  profilePicture: {
+    type: String,
+    default: null,
+  },
 });
 
 userSchema.pre("save", async function (next) {
   try {
-// Checking username and email uniqueness
+    // Checking username and email uniqueness
     const userExists = await mongoose
       .model("User")
       .findOne({ $or: [{ username: this.username }, { email: this.email }] });
