@@ -12,6 +12,7 @@ const signup = async (req, res, next) => {
       username: user.username,
       email: user.email,
       location: user.location,
+      phoneNumber: user.phoneNumber,
       token,
     });
   } catch (error) {
@@ -32,6 +33,7 @@ const getUserByUsername = async (req, res, next) => {
       username: user.username,
       email: user.email,
       location: user.location,
+      phoneNumber: user.phoneNumber,
     });
   } catch (error) {
     next(error);
@@ -62,6 +64,7 @@ const updateUser = async (req, res, next) => {
       username: updatedUser.username,
       email: updatedUser.email,
       location: updatedUser.location,
+      phoneNumber: updatedUser.phoneNumber,
     });
   } catch (error) {
     next(error);
@@ -82,6 +85,7 @@ const deleteUser = async (req, res, next) => {
       username: deletedUser.username,
       email: deletedUser.email,
       location: deletedUser.location,
+      phoneNumber: deletedUser.phoneNumber,
     });
   } catch (error) {
     next(error);
