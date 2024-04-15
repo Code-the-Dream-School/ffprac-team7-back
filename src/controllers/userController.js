@@ -12,6 +12,8 @@ const signup = async (req, res, next) => {
       username: user.username,
       email: user.email,
       location: user.location,
+      phoneNumber: user.phoneNumber,
+      profilePicture: user.profilePicture,
       token,
     });
   } catch (error) {
@@ -32,6 +34,8 @@ const getUserByUsername = async (req, res, next) => {
       username: user.username,
       email: user.email,
       location: user.location,
+      phoneNumber: user.phoneNumber,
+      profilePicture: user.profilePicture,
     });
   } catch (error) {
     next(error);
@@ -62,6 +66,8 @@ const updateUser = async (req, res, next) => {
       username: updatedUser.username,
       email: updatedUser.email,
       location: updatedUser.location,
+      phoneNumber: updatedUser.phoneNumber,
+      profilePicture: updatedUser.profilePicture,
     });
   } catch (error) {
     next(error);
@@ -82,6 +88,8 @@ const deleteUser = async (req, res, next) => {
       username: deletedUser.username,
       email: deletedUser.email,
       location: deletedUser.location,
+      phoneNumber: deletedUser.phoneNumber,
+      profilePicture: deletedUser.profilePicture,
     });
   } catch (error) {
     next(error);
@@ -107,6 +115,8 @@ const login = async (req, res, next) => {
       username: user.username,
       email: user.email,
       location: user.location,
+      phoneNumber: user.phoneNumber,
+      profilePicture: user.profilePicture,
       token,
     });
   } catch (error) {
@@ -114,4 +124,35 @@ const login = async (req, res, next) => {
   }
 };
 
-module.exports = { signup, getUserByUsername, updateUser, deleteUser, login };
+const uploadProfilePicture = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const profilePicturePath = req.file.path;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePicture: profilePicturePath },
+      { new: true }
+    );
+
+    res.status(StatusCodes.OK).json({
+      message: "Profile picture uploaded successfully",
+      username: updatedUser.username,
+      email: updatedUser.email,
+      location: updatedUser.location,
+      phoneNumber: updatedUser.phoneNumber,
+      profilePicture: updatedUser.profilePicture,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  signup,
+  getUserByUsername,
+  updateUser,
+  deleteUser,
+  login,
+  uploadProfilePicture,
+};
