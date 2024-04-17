@@ -18,6 +18,29 @@ const {
  *        - User Routes
  *     summary: Sign up into StuffFindr.
  *     description: Create a StuffFindr user account.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: User's username.
+ *                 example: lilytest
+ *               email:
+ *                 type: string
+ *                 description: User's email address.
+ *                 example: lilytest@test.com
+ *               password:
+ *                 type: string
+ *                 description: User's password for this account.
+ *                 example: password1
+ *               location:
+ *                 type: string
+ *                 description: User's location
+ *                 example: Los Angeles, CA
  *     responses:
  *       '200':
  *         description: Response after successfully creating an account.
@@ -58,6 +81,21 @@ router.post("/signup", signup);
  *        - User Routes
  *     summary: Login into a specific StuffFindr account.
  *     description: Login into a specific StuffFindr account. 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: User's username.
+ *                 example: lilytest
+ *               password:
+ *                 type: string
+ *                 description: User's password for this account.
+ *                 example: password1
  *     responses:
  *       '200':
  *         description: Response after successfully signing in.
@@ -98,6 +136,14 @@ router.post("/login", login);
  *        - User Routes
  *     summary: Find a StuffFindr account by username
  *     description: Find a user's StuffFindr account by using their username. 
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         description: StuffFindr username of the user to retrieve account. 
+ *         schema:
+ *           type: string
+ *         example: lilytest
  *     responses:
  *       '200':
  *         description: Response after successfully finding a StuffFindr user. 
@@ -124,7 +170,7 @@ router.post("/login", login);
  *                         description: User's inputted location.
  *                         example: Los Angeles, CA
 */
-router.put("/:userId", authenticateUser, getUserByUsername);
+router.get("/:username", authenticateUser, getUserByUsername);
 
 /**
  * @swagger
@@ -134,6 +180,30 @@ router.put("/:userId", authenticateUser, getUserByUsername);
  *        - User Routes
  *     summary: Update a StuffFindr account by userId
  *     description: Make an update to a user's StuffFindr account by using their account userId. 
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         description: The StuffFindr account userId which can be obtained from the database and/or from the token.
+ *         schema:
+ *           type: string
+ *         example: 661e5f1684beefd1560e2e29
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 required: true
+ *                 description: User's password.
+ *                 example: password1
+ *               location:
+ *                 type: string
+ *                 description: Field(s) with their new values
+ *                 example: Miami, FL
  *     responses:
  *       '200':
  *         description: Response after successfully updating a StuffFindr account. 
@@ -173,6 +243,14 @@ router.put("/:userId", authenticateUser, updateUser);
  *        - User Routes
  *     summary: Delete a StuffFindr account by userId
  *     description: Delete a user's StuffFindr account by using their account userId. 
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         description: The StuffFindr account userId which can be obtained from the database and/or from the token.
+ *         schema:
+ *           type: string
+ *         example: 661e5f1684beefd1560e2e29
  *     responses:
  *       '200':
  *         description: Response after successfully deleting a StuffFindr account. 
