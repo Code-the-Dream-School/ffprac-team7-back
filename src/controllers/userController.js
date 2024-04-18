@@ -10,6 +10,7 @@ const signup = async (req, res, next) => {
     const token = user.createJWT();
     res.status(StatusCodes.CREATED).json({
       username: user.username,
+      userId: user._id,
       email: user.email,
       location: user.location,
       phoneNumber: user.phoneNumber,
@@ -32,6 +33,7 @@ const getUserByUsername = async (req, res, next) => {
 
     res.status(StatusCodes.OK).json({
       username: user.username,
+      userId: user._id,
       email: user.email,
       location: user.location,
       phoneNumber: user.phoneNumber,
@@ -113,6 +115,7 @@ const login = async (req, res, next) => {
     const token = user.createJWT();
     res.status(StatusCodes.OK).json({
       username: user.username,
+      userId: user._id,
       email: user.email,
       location: user.location,
       phoneNumber: user.phoneNumber,
