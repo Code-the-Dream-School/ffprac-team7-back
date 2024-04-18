@@ -12,6 +12,12 @@ const userSchema = new mongoose.Schema({
     maxlength: 50,
     unique: true,
     trim: true,
+    validate: {
+      validator: function (value) {
+        return validator.isAlphanumeric(value);
+      },
+      message: "Username must be alphanumeric",
+    },
   },
   email: {
     type: String,
@@ -23,6 +29,12 @@ const userSchema = new mongoose.Schema({
     unique: true,
     trim: true,
     lowercase: true,
+    validate: {
+      validator: function (value) {
+        return validator.isEmail(value);
+      },
+      message: "Please provide a valid email",
+    },
   },
   password: {
     type: String,
@@ -32,18 +44,24 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  phoneNumber: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function (value) {
+        return validator.isMobilePhone(value, "any");
+      },
+      message: "Please provide a valid phone number",
+    },
+  },
+  profilePicture: {
+    type: String,
+    default: null,
+  },
 });
 
 userSchema.pre("save", async function (next) {
   try {
-    if (!validator.isAlphanumeric(this.username)) {
-      throw new BadRequestError("Username must be alphanumeric");
-    }
-
-    if (!validator.isEmail(this.email)) {
-      throw new BadRequestError("Please provide a valid email");
-    }
-
     // Checking username and email uniqueness
     const userExists = await mongoose
       .model("User")

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const authenticateUser = require("../middleware/authentication")
+const authenticateUser = require("../middleware/authentication");
+const upload = require("../../config/multerConfig");
 
 const {
   signup,
@@ -8,6 +9,7 @@ const {
   updateUser,
   deleteUser,
   login,
+  uploadProfilePicture,
 } = require("../controllers/userController");
 
 /**
@@ -127,49 +129,12 @@ router.post("/signup", signup);
  *                         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjFlNWYxNjg0ZGRlZmQxNTYwZTJlMjkiLCJ1c2VybmFtZSI6Im5pbmF0ZXN0IiwiaWF0IjoxNzEzMjY2NDU1LCJleHAiOjE3MTU4NTp0NTV9.Z_XLzqwiWAFTL6It16mwDEeq1zH9NcLh8H8P15vmpL8"
 */
 router.post("/login", login);
-
-/**
- * @swagger
- * /users/:username:
- *   get:
- *     tags: 
- *        - User Routes
- *     summary: Find a StuffFindr account by username
- *     description: Find a user's StuffFindr account by using their username. 
- *     parameters:
- *       - in: path
- *         name: username
- *         required: true
- *         description: StuffFindr username of the user to retrieve account. 
- *         schema:
- *           type: string
- *         example: lilytest
- *     responses:
- *       '200':
- *         description: Response after successfully finding a StuffFindr user. 
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       username:
- *                         type: string
- *                         description: User's username.
- *                         example: lilytest
- *                       email:
- *                         type: string
- *                         description: User's email address.
- *                         example: lilytest@test.com
- *                       location:
- *                         type: string
- *                         description: User's inputted location.
- *                         example: Los Angeles, CA
-*/
+router.post(
+  "/upload-profile-picture",
+  authenticateUser,
+  upload.single("profilePicture"),
+  uploadProfilePicture
+);
 router.get("/:username", authenticateUser, getUserByUsername);
 
 /**
