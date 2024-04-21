@@ -113,13 +113,13 @@ const updateItem = async (req, res, next) => {
 // Allows a logged in user to claim (PUT) ownership of an item with their userId
 const claimItem = async (req, res, next) => {
     try {
-        req.body.lost = false;
-        req.body.claimedBy = req.user.userId;
-        req.body.dateClaimed = Date.now();
+      req.body.lost = false;
+      req.body.claimedBy = req.user.userId;
+      req.body.dateClaimed = Date.now();
 
-        const {
-      params: { itemId: itemId },
-        } = req;
+      const {
+       params: { itemId: itemId },
+      } = req;
 
     const item = await Item.findOneAndUpdate({ _id: itemId }, req.body, {
       new: true,
@@ -131,7 +131,16 @@ const claimItem = async (req, res, next) => {
     }
     res
       .status(StatusCodes.OK)
-      .json({ msg: "The item has been successfully claimed.", item });
+      .json({ 
+       msg: "The item has been successfully claimed.",
+       title: item.title,
+       description: item.description,
+       location: item.location,
+       itemId: item._id,
+       lost: item.lost,
+       claimedBy: item.claimedBy,
+       dateClaimed: item.dateClaimed
+      });
   } catch (error) {
     next(error);
     }
@@ -140,25 +149,32 @@ const claimItem = async (req, res, next) => {
 // Allows a logged in user to confirm (POST) that the claimer's ownership of the item they have POSTed has been verified
 const confirmClaim = async (req, res, next) => {
     try {
-        req.body.claimConfirmed = true;
+      req.body.claimConfirmed = true;
         
-        const {
-      user: { userId },
-      params: { itemId: itemId },
-    } = req;
+      const {
+        user: { userId },
+        params: { itemId: itemId },
+      } = req;
 
-    const item = await Item.findOneAndUpdate(
+      const item = await Item.findOneAndUpdate(
       { _id: itemId, reportedBy: userId },
       req.body,
       { new: true, runValidators: true }
     );
 
-        if (!item) {
-      throw new NotFoundError();
-    }
-    res.status(StatusCodes.OK).json({
+      if (!item) {
+       throw new NotFoundError();
+      }
+      res.status(StatusCodes.OK).json({
       msg: "The claim of this item has successfully been confirmed.",
-      item,
+      title: item.title,
+      description: item.description,
+      location: item.location,
+      itemId: item._id,
+      lost: item.lost,
+      claimedBy: item.claimedBy,
+      dateClaimed: item.dateClaimed, 
+      claimConfirmed: item.claimConfirmed
     });
   } catch (error) {
     next(error);
