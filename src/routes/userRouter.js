@@ -19,17 +19,10 @@ const {
  *   securitySchemes:
  *     bearerAuth:
  *       type: http
+ *       in: header
+ *       name: Authorization
  *       scheme: bearer
  *       bearerFormat: JWT
- *       properties:
- *         id:
- *           type: integer
- *           description: The user ID.
- *           example: 0
- *         name:
- *           type: string
- *           description: The user's name.
- *           example: Leanne Graham
  */
 
 // User routes with Swagger documentation
@@ -59,7 +52,7 @@ const {
  *               password:
  *                 type: string
  *                 description: User's password for this account.
- *                 example: password1
+ *                 example: Password1
  *               location:
  *                 type: string
  *                 description: User's location
@@ -67,11 +60,7 @@ const {
  *               phoneNumber:
  *                 type: string
  *                 description: User's phone number.
- *                 example: (980) 111 - 1234
- *               profilePicture:
- *                 type: string
- *                 description: Uploaded profile picture
- *                 example: profile-pic.img
+ *                 example: 9801111234
  *     responses:
  *       '200':
  *         description: Response after successfully creating an account.
@@ -80,39 +69,34 @@ const {
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       username:
- *                         type: string
- *                         description: User's username.
- *                         example: lilytest
- *                       userId:
- *                         type: string
- *                         description: account holder's userId.
- *                         example: 661e5f1684beefd1560e2e29
- *                       email:
- *                         type: string
- *                         description: User's email address.
- *                         example: lilytest@test.com
- *                       location:
- *                         type: string
- *                         description: User's inputted location.
- *                         example: Los Angeles, CA
- *                       phoneNumber:
- *                         type: string
- *                         description: User's phone number.
- *                         example: (980) 111 - 1234
- *                       profilePicture:
- *                         type: string
- *                         description: Uploaded profile picture
- *                         example: profile-pic.img
- *                       token:
- *                         type: string
- *                         description: User token created after signing up.
- *                         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjFlNWYxNjg0ZGRlZmQxNTYwZTJlMjkiLCJ1c2VybmFtZSI6Im5pbmF0ZXN0IiwiaWF0IjoxNzEzMjY2NDU1LCJleHAiOjE3MTU4NTp0NTV9.Z_XLzqwiWAFTL6It16mwDEeq1zH9NcLh8H8P15vmpL8"
+ *                 username:
+ *                   type: string
+ *                   description: User's username.
+ *                   example: lilytest
+ *                 userId:
+ *                   type: string
+ *                   description: account holder's userId.
+ *                   example: 6624306847cf7dfa1a54b917
+ *                 email:
+ *                   type: string
+ *                   description: User's email address.
+ *                   example: lilytest@test.com
+ *                 location:
+ *                   type: string
+ *                   description: User's inputted location.
+ *                   example: Los Angeles, CA
+ *                 phoneNumber:
+ *                   type: string
+ *                   description: User's phone number.
+ *                   example: 9801111234
+ *                 profilePicture:
+ *                   type: string
+ *                   description: Uploaded profile picture
+ *                   example: null
+ *                 token:
+ *                   type: string
+ *                   description: User token created after signing up.
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjFlNWYxNjg0ZGRlZmQxNTYwZTJlMjkiLCJ1c2VybmFtZSI6Im5pbmF0ZXN0IiwiaWF0IjoxNzEzMjY2NDU1LCJleHAiOjE3MTU4NTp0NTV9.Z_XLzqwiWAFTL6It16mwDEeq1zH9NcLh8H8P15vmpL8
 */
 router.post("/signup", signup);
 
@@ -138,7 +122,7 @@ router.post("/signup", signup);
  *               password:
  *                 type: string
  *                 description: User's password for this account.
- *                 example: password1
+ *                 example: Password1
  *     responses:
  *       '200':
  *         description: Response after successfully signing in.
@@ -147,39 +131,34 @@ router.post("/signup", signup);
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       username:
- *                         type: string
- *                         description: User's username.
- *                         example: lilytest
- *                       userId:
- *                         type: string
- *                         description: account holder's userId.
- *                         example: 661e5f1684beefd1560e2e29
- *                       email:
- *                         type: string
- *                         description: User's email address.
- *                         example: lilytest@test.com
- *                       location:
- *                         type: string
- *                         description: User's inputted location.
- *                         example: Los Angeles, CA
- *                       phoneNumber:
- *                         type: string
- *                         description: User's phone number.
- *                         example: (980) 111 - 1234
- *                       profilePicture:
- *                         type: string
- *                         description: Uploaded profile picture
- *                         example: profile-pic.img
- *                       token:
- *                         type: string
- *                         description: User token created after loggin in, which will be needed for lost items management
- *                         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjFlNWYxNjg0ZGRlZmQxNTYwZTJlMjkiLCJ1c2VybmFtZSI6Im5pbmF0ZXN0IiwiaWF0IjoxNzEzMjY2NDU1LCJleHAiOjE3MTU4NTp0NTV9.Z_XLzqwiWAFTL6It16mwDEeq1zH9NcLh8H8P15vmpL8"
+ *                 username:
+ *                   type: string
+ *                   description: User's username.
+ *                   example: lilytest
+ *                 userId:
+ *                   type: string
+ *                   description: account holder's userId.
+ *                   example: 6624306847cf7dfa1a54b917
+ *                 email:
+ *                   type: string
+ *                   description: User's email address.
+ *                   example: lilytest@test.com
+ *                 location:
+ *                   type: string
+ *                   description: User's inputted location.
+ *                   example: Los Angeles, CA
+ *                 phoneNumber:
+ *                   type: string
+ *                   description: User's phone number.
+ *                   example: 9801111234
+ *                 profilePicture:
+ *                   type: string
+ *                   description: Uploaded profile picture
+ *                   example: null
+ *                 token:
+ *                   type: string
+ *                   description: User token created after signing up.
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjFlNWYxNjg0ZGRlZmQxNTYwZTJlMjkiLCJ1c2VybmFtZSI6Im5pbmF0ZXN0IiwiaWF0IjoxNzEzMjY2NDU1LCJleHAiOjE3MTU4NTp0NTV9.Z_XLzqwiWAFTL6It16mwDEeq1zH9NcLh8H8P15vmpL8
 */
 router.post("/login", login);
 
@@ -231,34 +210,29 @@ router.post("/login", login);
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       message:
- *                         type: string
- *                         example: "Profile picture uploaded successfully"
- *                       username:
- *                         type: string
- *                         description: User's username.
- *                         example: lilytest
- *                       email:
- *                         type: string
- *                         description: User's email address.
- *                         example: lilytest@test.com
- *                       location:
- *                         type: string
- *                         description: User's inputted location.
- *                         example: Los Angeles, CA
- *                       phoneNumber:
- *                         type: string
- *                         description: User's phone number.
- *                         example: (980) 111 - 1234
- *                       profilePicture:
- *                         type: string
- *                         description: Uploaded profile picture
- *                         example: profile-pic.img
+ *                 message:
+ *                   type: string
+ *                   example: Profile picture uploaded successfully
+ *                 username:
+ *                   type: string
+ *                   description: User's username.
+ *                   example: lilytest
+ *                 email:
+ *                   type: string
+ *                   description: User's email address.
+ *                   example: lilytest@test.com
+ *                 location:
+ *                   type: string
+ *                   description: User's inputted location.
+ *                   example: Los Angeles, CA
+ *                 phoneNumber:
+ *                   type: string
+ *                   description: User's phone number.
+ *                   example: 9801111234
+ *                 profilePicture:
+ *                   type: string
+ *                   description: Uploaded profile picture
+ *                   example: profile-pic.img
 */
 router.post(
   "/upload-profile-picture",
@@ -275,6 +249,8 @@ router.post(
  *        - User Routes
  *     summary: Find a StuffFindr account by username
  *     description: Find a user's StuffFindr account by using their username. 
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: username
@@ -291,35 +267,30 @@ router.post(
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       username:
- *                         type: string
- *                         description: User's username.
- *                         example: lilytest
- *                       userId:
- *                         type: string
- *                         description: account holder's userId.
- *                         example: 661e5f1684beefd1560e2e29
- *                       email:
- *                         type: string
- *                         description: User's email address.
- *                         example: lilytest@test.com
- *                       location:
- *                         type: string
- *                         description: User's inputted location.
- *                         example: Los Angeles, CA
- *                       phoneNumber:
- *                         type: string
- *                         description: User's phone number.
- *                         example: (980) 111 - 1234
- *                       profilePicture:
- *                         type: string
- *                         description: Uploaded profile picture
- *                         example: profile-pic.img 
+ *                 username:
+ *                   type: string
+ *                   description: User's username.
+ *                   example: lilytest
+ *                 userId:
+ *                   type: string
+ *                   description: account holder's userId.
+ *                   example: 6624306847cf7dfa1a54b917
+ *                 email:
+ *                   type: string
+ *                   description: User's email address.
+ *                   example: lilytest@test.com
+ *                 location:
+ *                   type: string
+ *                   description: User's inputted location.
+ *                   example: Los Angeles, CA
+ *                 phoneNumber:
+ *                   type: string
+ *                   description: User's phone number.
+ *                   example: 9801111234
+ *                 profilePicture:
+ *                   type: string
+ *                   description: Uploaded profile picture
+ *                   example: profile-pic.img
 */
 router.get("/:username", authenticateUser, getUserByUsername);
 
@@ -331,6 +302,8 @@ router.get("/:username", authenticateUser, getUserByUsername);
  *        - User Routes
  *     summary: Update a StuffFindr account by userId
  *     description: Make an update to a user's StuffFindr account by using their account userId. 
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -338,7 +311,7 @@ router.get("/:username", authenticateUser, getUserByUsername);
  *         description: The StuffFindr account userId which can be obtained from the database and/or from the token.
  *         schema:
  *           type: string
- *         example: 661e5f1684beefd1560e2e29
+ *         example: 6624306847cf7dfa1a54b917
  *     requestBody:
  *       required: true
  *       content:
@@ -350,7 +323,7 @@ router.get("/:username", authenticateUser, getUserByUsername);
  *                 type: string
  *                 required: true
  *                 description: User's password.
- *                 example: password1
+ *                 example: Password1
  *               location:
  *                 type: string
  *                 description: Field(s) with their new values
@@ -363,34 +336,29 @@ router.get("/:username", authenticateUser, getUserByUsername);
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       message:
- *                         type: string
- *                         example: "User updated successfully"
- *                       username:
- *                         type: string
- *                         description: User's username.
- *                         example: lilytest
- *                       email:
- *                         type: string
- *                         description: User's email address.
- *                         example: lilytest@test.com
- *                       location:
- *                         type: string
- *                         description: User's inputted location.
- *                         example: Miami, FL
- *                       phoneNumber:
- *                         type: string
- *                         description: User's phone number.
- *                         example: (980) 111 - 1234
- *                       profilePicture:
- *                         type: string
- *                         description: Uploaded profile picture
- *                         example: profile-pic.img
+ *                 message:
+ *                   type: string
+ *                   example: User updated successfully
+ *                 username:
+ *                   type: string
+ *                   description: User's username.
+ *                   example: lilytest
+ *                 email:
+ *                   type: string
+ *                   description: User's email address.
+ *                   example: lilytest@test.com
+ *                 location:
+ *                   type: string
+ *                   description: User's inputted location.
+ *                   example: Miami, FL
+ *                 phoneNumber:
+ *                   type: string
+ *                   description: User's phone number.
+ *                   example: 9801111234
+ *                 profilePicture:
+ *                   type: string
+ *                   description: Uploaded profile picture
+ *                   example: profile-pic.img
 */
 router.put("/:userId", authenticateUser, updateUser);
 
@@ -402,6 +370,8 @@ router.put("/:userId", authenticateUser, updateUser);
  *        - User Routes
  *     summary: Delete a StuffFindr account by userId
  *     description: Delete a user's StuffFindr account by using their account userId. 
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -409,7 +379,7 @@ router.put("/:userId", authenticateUser, updateUser);
  *         description: The StuffFindr account userId which can be obtained from the database and/or from the token.
  *         schema:
  *           type: string
- *         example: 661e5f1684beefd1560e2e29
+ *         example: 6624306847cf7dfa1a54b917
  *     responses:
  *       '200':
  *         description: Response after successfully deleting a StuffFindr account. 
@@ -418,34 +388,29 @@ router.put("/:userId", authenticateUser, updateUser);
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       message:
- *                         type: string
- *                         example: "User deleted successfully"
- *                       username:
- *                         type: string
- *                         description: User's username.
- *                         example: lilytest
- *                       email:
- *                         type: string
- *                         description: User's email address.
- *                         example: lilytest@test.com
- *                       location:
- *                         type: string
- *                         description: User's inputted location.
- *                         example: Los Angeles, CA
- *                       phoneNumber:
- *                         type: string
- *                         description: User's phone number.
- *                         example: (980) 111 - 1234
- *                       profilePicture:
- *                         type: string
- *                         description: Uploaded profile picture
- *                         example: profile-pic.img
+ *                 message:
+ *                   type: string
+ *                   example: User deleted successfully
+ *                 username:
+ *                   type: string
+ *                   description: User's username.
+ *                   example: lilytest
+ *                 email:
+ *                   type: string
+ *                   description: User's email address.
+ *                   example: lilytest@test.com
+ *                 location:
+ *                   type: string
+ *                   description: User's inputted location.
+ *                   example: Los Angeles, CA
+ *                 phoneNumber:
+ *                   type: string
+ *                   description: User's phone number.
+ *                   example: 9801111234
+ *                 profilePicture:
+ *                   type: string
+ *                   description: Uploaded profile picture
+ *                   example: profile-pic.img
 */
 router.delete("/:userId", authenticateUser, deleteUser);
 
