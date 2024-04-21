@@ -15,14 +15,14 @@ const {
 // Swagger Authorization components
 /**
  * @swagger
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       in: header
- *       name: Authorization
- *       scheme: bearer
- *       bearerFormat: JWT
+ *  components:
+ *    securitySchemes:
+ *      bearerAuth:
+ *        type: http
+ *        in: header
+ *        name: Authorization
+ *        scheme: bearer
+ *        bearerFormat: JWT
  */
 
 // User routes with Swagger documentation

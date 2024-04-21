@@ -10,7 +10,16 @@ const createItem = async (req, res, next) => {
         const item = await Item.create(req.body);
     res
       .status(StatusCodes.CREATED)
-      .json({ msg: "The item has been created.", item });
+      .json({ 
+        message: "The item has been created.", 
+        title: item.title,
+        description: item.description,
+        location: item.location,
+        lost: item.lost,
+        itemId: item._id,
+        dateReported: item.createdAt,
+        reportedByuserId: item.reportedBy
+      });
     } catch (error) {
     next(error);
 }
