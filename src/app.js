@@ -44,7 +44,7 @@ const swaggerDefinition = {
     },
     servers: [
         {   
-            url: "http://localhost:8000",
+            url: "http://localhost:8000/api/v1",
             description: "Development server",
         }
     ],
@@ -52,6 +52,7 @@ const swaggerDefinition = {
 
 const options = {
     swaggerDefinition,
+    schemes: ["https", "http"],
     apis: ["src/routes/userRouter.js", "src/routes/itemRouter.js"],
 };
 
