@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router()
+const upload = require("../../config/multerConfig");
+
 const {
     createItem,
     getItem,
     getAllItems,
     getAllItemsByUser,
+    uploadItemImages,
     updateItem,
     claimItem,
     confirmClaim,
@@ -201,6 +204,92 @@ router.route('/byUser/:userId').get(getAllItemsByUser);
  *               $ref: '#/components/schemas/ItemResponse'
 */
 router.route('/:itemId').get(getItem)
+
+/**
+ * @swagger
+ * /items/:itemId:/upload-item-images:
+ *   post:
+ *     tags: 
+ *        - Item Routes
+ *     summary: Upload item images
+ *     description: Upload images for the item.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: itemId
+ *         required: true
+ *         description: The StuffFindr itemId, which can be obtained from the database and/or from the json response after creating the item.
+ *         schema:
+ *           type: string
+ *         example: 6625601fd050eb176b2165b4
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: string
+ *                 format: binary
+ *                 description: Item images
+ *                 example: image.img
+ *               userId:
+ *                 type: string
+ *                 description: This userId value is obtained from the token payload as req.user.userId
+ *                 example: 6624306847cf7dfa1a54b917
+ *     responses:
+ *       '200':
+ *         description: Response after successfully updating a lost item in the StuffFindr database.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: The images of the item have been uploaded successfully.
+ *                 title:
+ *                   type: string
+ *                   required: true
+ *                   description: Title of the lost item.
+ *                   example: Rain Jacket 
+ *                 description:
+ *                   type: string
+ *                   required: true
+ *                   description: Description of the lost item.
+ *                   example: A green rain jacket was found in a park near Venice beach
+ *                 location:
+ *                   type: string
+ *                   required: true
+ *                   description: Location where the item was found.
+ *                   example: Miami, FL
+ *                 lost:
+ *                   type: boolean
+ *                   required: true
+ *                   description: Is the item currently lost?
+ *                   example: true
+ *                 itemId:
+ *                   type: string
+ *                   description: ItemId of the lost item in the StuffFindr database.
+ *                   example: 6625601fd050eb176b2165b4
+ *                 dateReported:
+ *                   type: string
+ *                   required: true
+ *                   description: Date that the lost item was reported.
+ *                   example: 2024-04-21T18:48:31.411Z
+ *                 reportedBy:
+ *                   type: string
+ *                   required: true
+ *                   description: StuffFindr userId of the user that reported the item. 
+ *                   example: 6624306847cf7dfa1a54b917
+ *                 images:
+ *                   type: string
+ *                   description: Uploaded item images 
+ *                   example: image.img
+*/
+router.post("/:itemId/upload-item-images", upload.any(), uploadItemImages);
 
 /**
  * @swagger
