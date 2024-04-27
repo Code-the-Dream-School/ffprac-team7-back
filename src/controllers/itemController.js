@@ -80,15 +80,15 @@ const getAllItemsByUser = async (req, res, next) => {
 
 const uploadItemImages = async (req, res, next) => {
   try {
-    const itemImagesPath = req.file.path;
+    const itemImagePath = req.file.path;
+    const userId = req.user.userId;
     const  {
-      userId: { userId },
       params: { itemId: itemId },
     } = req
 
     const updatedItem = await Item.findOneAndUpdate(
       { _id: itemId, reportedBy: userId },
-      { images: itemImagesPath },
+      { images: itemImagePath },
       { new: true }
     );
 

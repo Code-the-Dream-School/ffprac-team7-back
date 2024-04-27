@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router()
+const router = express.Router();
 const upload = require("../../config/multerConfig");
 
 const {
@@ -207,7 +207,7 @@ router.route('/:itemId').get(getItem)
 
 /**
  * @swagger
- * /items/:itemId:/upload-item-images:
+ * /items/:itemId/image:
  *   post:
  *     tags: 
  *        - Item Routes
@@ -289,7 +289,7 @@ router.route('/:itemId').get(getItem)
  *                   description: Uploaded item images 
  *                   example: image.img
 */
-router.post("/:itemId/upload-item-images", upload.any(), uploadItemImages);
+router.post("/:itemId/image", upload.single('itemImage'), uploadItemImages);
 
 /**
  * @swagger

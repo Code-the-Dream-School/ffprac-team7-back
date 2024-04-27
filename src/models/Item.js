@@ -14,9 +14,9 @@ const ItemSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Please enter the location where the item was lost'],
         },
-        images: [{
+        images: {
             type: String,
-        }],
+        },
         lost: {
             type: Boolean,
             required: true,
