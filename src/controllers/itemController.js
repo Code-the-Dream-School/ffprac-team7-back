@@ -78,6 +78,36 @@ const getAllItemsByUser = async (req, res, next) => {
 }
 };
 
+const uploadItemImages = async (req, res, next) => {
+  try {
+    const itemImagePath = req.file.path;
+    const userId = req.user.userId;
+    const  {
+      params: { itemId: itemId },
+    } = req
+
+    const updatedItem = await Item.findOneAndUpdate(
+      { _id: itemId, reportedBy: userId },
+      { images: itemImagePath },
+      { new: true }
+    );
+
+    res.status(StatusCodes.OK).json({
+      message: "The images of the item have been uploaded successfully",
+      title: updatedItem.title,
+      description: updatedItem.description,
+      location: updatedItem.location,
+      lost: updatedItem.lost,
+      itemId: updatedItem._id,
+      dateReported: updatedItem.createdAt,
+      reportedByuserId: updatedItem.reportedBy,
+      images: updatedItem.images,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Allows a logged in user to Update (PUT) an item they have POSTed
 const updateItem = async (req, res, next) => {
     try {
@@ -234,6 +264,7 @@ module.exports = {
     getItem,
     getAllItems, 
     getAllItemsByUser,
+    uploadItemImages,
     updateItem,
     claimItem, 
     confirmClaim,
